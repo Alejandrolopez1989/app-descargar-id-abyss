@@ -1,11 +1,10 @@
 #!/data/data/com.termux/files/usr/bin/bash
 # ==========================================================
 #  Abyss Downloader - instalador automático para Termux
+#  Versión ultra-automatizada: solo comando único
 # ==========================================================
-VERSION="1.0.0"
-# URL directa al JAR en Releases (subí el JAR a un Release antes)
+VERSION="2.0.0"
 JAR_URL="https://github.com/Alejandrolopez1989/app-descargar-id-abyss/releases/latest/download/abyss-dl.jar"
-# URL de ESTE script para auto-actualización
 SCRIPT_URL="https://raw.githubusercontent.com/Alejandrolopez1989/app-descargar-id-abyss/main/setup_abyss.sh"
 WORKDIR="$HOME/abyss_server"
 
@@ -24,10 +23,10 @@ if [ -n "$REMOTE_VER" ] && [ "$REMOTE_VER" != "$LOCAL_VER" ]; then
 fi
 
 # ---------- Dependencias ----------
-echo "🔧 Instalando dependencias (python, openjdk-21, flask)..."
+echo "🔧 Instalando dependencias..."
 pkg update -y >/dev/null 2>&1
-pkg install -y python openjdk-21 >/dev/null 2>&1
-pip install -q flask 2>/dev/null
+pkg install -y python openjdk-21 net-tools >/dev/null 2>&1
+pip install -q flask >/dev/null 2>&1
 echo "   ✅ Listo"
 
 # ---------- Estructura ----------
@@ -271,18 +270,47 @@ sleep 1
 # ---------- Arrancar ----------
 cd "$WORKDIR"
 nohup python server.py > server.log 2>&1 &
-sleep 6
+sleep 8
 
-IP=$(ifconfig 2>/dev/null | awk '/wlan0|swlan0/ && /inet/ {print $2; exit}')
+# ---------- Obtener IP automáticamente ----------
+IP=""
+# Método 1: ifconfig
+if [ -z "$IP" ] && command -v ifconfig >/dev/null 2>&1; then
+    IP=$(ifconfig 2>/dev/null | awk '/wlan0|swlan0|wlan|eth0/ {getline; if($1=="inet") print $2; exit}')
+fi
+# Método 2: ip addr
+if [ -z "$IP" ] && command -v ip >/dev/null 2>&1; then
+    IP=$(ip addr 2>/dev/null | awk '/wlan|swlan|eth0/ {getline; if($1=="inet") print $2; exit}' | cut -d/ -f1)
+fi
+# Método 3: hostname -I
+if [ -z "$IP" ]; then
+    IP=$(hostname -I 2>/dev/null | awk '{print $1}')
+fi
+# Método 4: proc net fib_trie
+if [ -z "$IP" ]; then
+    IP=$(grep -E '^[[:space:]]+[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+' /proc/net/fib_trie 2>/dev/null | head -1 | awk '{print $1}')
+fi
 
 echo ""
 echo "============================================"
 echo "🚀 ¡Abyss Downloader LISTO!"
 echo "============================================"
-echo "🌐 URL: http://$IP:5000"
+if [ -n "$IP" ]; then
+    echo "🌐 URL: http://$IP:5000"
+    echo ""
+    echo "📱 Paso final: Abrí el navegador del celular y escribí:"
+    echo "               http://$IP:5000"
+    echo ""
+    echo "💡 Intento de abrir navegador automáticamente..."
+    am start -a android.intent.action.VIEW -d "http://$IP:5000" >/dev/null 2>&1 && echo "   ✅ Navegador abierto" || echo "   ⚠️  No se pudo abrir automáticamente, abrí el navegador manualmente."
+else
+    echo "⚠️  No se detectó la IP automáticamente."
+    echo "   Ejecutá este comando en Termux para verla:"
+    echo "   hostname -I"
+fi
 echo ""
 echo "📂 Videos en: /sdcard/Download"
-echo "📋 Log del server: ~/abyss_server/server.log"
+echo "📋 Log del servidor: ~/abyss_server/server.log"
 echo ""
 echo "⚠️  Dejá Termux abierto mientras uses la app."
 echo "============================================"
