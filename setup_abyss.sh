@@ -5,7 +5,7 @@
 VERSION="1.0.0"
 JAR_URL="JAR_URL="https://github.com/Alejandrolopez1989/app-descargar-id-abyss/releases/latest/download/abyss-dl.jar""   # <-- poné tu URL
 WORKDIR="$HOME/abyss_server"
-SCRIPT_URL="https://raw.githubusercontent.com/USER/REPO/main/setup_abyss.sh"
+SCRIPT_URL="https://raw.githubusercontent.com/Alejandrolopez1989/app-descargar-id-abyss/main/setup_abyss.sh"
 
 echo ""
 echo "╔══════════════════════════════════════╗"
