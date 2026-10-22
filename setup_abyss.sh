@@ -3,9 +3,11 @@
 #  Abyss Downloader - instalador automático para Termux
 # ==========================================================
 VERSION="1.0.0"
-JAR_URL="JAR_URL="https://github.com/Alejandrolopez1989/app-descargar-id-abyss/releases/latest/download/abyss-dl.jar""   # <-- poné tu URL
-WORKDIR="$HOME/abyss_server"
+# URL directa al JAR en Releases (subí el JAR a un Release antes)
+JAR_URL="https://github.com/Alejandrolopez1989/app-descargar-id-abyss/releases/latest/download/abyss-dl.jar"
+# URL de ESTE script para auto-actualización
 SCRIPT_URL="https://raw.githubusercontent.com/Alejandrolopez1989/app-descargar-id-abyss/main/setup_abyss.sh"
+WORKDIR="$HOME/abyss_server"
 
 echo ""
 echo "╔══════════════════════════════════════╗"
